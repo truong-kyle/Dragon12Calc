@@ -5,72 +5,10 @@
 #include "keypad.h"
 #include "util.h"
 
-/**
- * 7 segments LED decoder
- * 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H
- *
- * Example: if you want to show "1" on LED segments
- * you should do the following:
- * DDRB = 0xff; //set all pin on port b to output
- * PORTB = segment_decoder[1]; //which means one decodes to 0x06:
- * G F E D C B A
- * 0 0 0 0 1 1 0
- *
- *		 A
- * 		----
- * 	   |	| B
- * 	 F |  	|
- * 		--G-        ===> if B and C segments are one we get the shape of 1 (number one)
- * 	   |	| C
- * 	 E |	|
- * 		----
- *       D
- */
-unsigned int segment_decoder[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d,
-		0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 };
-
-volatile char message_index_on_7segment_LEDs = 0;
-volatile unsigned int counter_for_real_time_interrupt;
-volatile unsigned int display_counter = 0;
-volatile unsigned int counter_for_real_time_interrupt_limit;
-//volatile int buf;
-int cursor = 0;
-
-void display_hex_number_on_7segment_LEDs(unsigned int number) {
-	static int index_on_7segment_LEDs = 0;
-
-	//DDRB = 0xff; // PortB is set to be output.
-	DDRP = 0xff;
-
-	PTP = ~(1 << (3 - index_on_7segment_LEDs)); //notice it is negative logic
-	PORTB = segment_decoder[(number >> (char) (4 * (index_on_7segment_LEDs)))
-			& 0xf];
-
-	index_on_7segment_LEDs++;
-	/**
-	 * Index should be 1,2,4,8 ... we shift to left each time
-	 * example: 0001 << 1 will be: 0010 = 2
-	 * and 2 = 0010 << 1 will be: 0100 = 4
-	 * and so on ...
-	 */
-
-	if (index_on_7segment_LEDs > 3) //means we reach the end of 4 segments LEDs we have
-		index_on_7segment_LEDs = 0;
-
-	/**
-	 * simple example of showing "7" on the first LEDs (the most left one)
-	 DDRB  = 0xff; // PortB is set to be output.
-	 DDRP  = 0xff;
-	 PTP   = ~0x1; //negative logic - means "7" will be shown on first LEDs
-	 PORTB = 0x07;
-	 */
-}
-
 volatile unsigned int keypad_debounce_timer = 0;
 
 void execute_the_jobs() {
 	//put the jobs you want to be done here ...
-	display_hex_number_on_7segment_LEDs(43690);
 	keypad_debounce_timer++;
 	if (keypad_debounce_timer > 400) {
 		keypad_debounce_timer = 0; //display_hex_numbcount++;er_on_7segment_LEDs(display_counter++);
@@ -153,7 +91,6 @@ int main(void) {
 
 	DispInit(2, 16);
 	DispClrScr();
-	//DispStr(1, 1, "Calculator")
 	int a = 0;
 	int b = 0;
 	char op = '!';
@@ -217,7 +154,6 @@ int main(void) {
 			}
 			printf("Debug: %d\r\nKeypad: %c\r\n", result, c);
 		}
-		//displays hexadecimal equivalent
 	}
 
 }
