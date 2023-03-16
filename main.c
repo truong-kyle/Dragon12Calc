@@ -154,6 +154,7 @@ int main(void) {
 			}
 			printf("Debug: %d\r\nKeypad: %c\r\n", result, c);
 		}
+		
 	}
 
 }
