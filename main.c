@@ -45,20 +45,6 @@ void rti_init(unsigned char rti_ctl_value, unsigned int counter_limit) {
 	 */
 	counter_for_real_time_interrupt_limit = counter_limit;
 
-	/**
-	 * RTICTL can be calculated like:
-	 * i.e: RTICTL == 0x63 == set rate to 16.384 ms:
-	 * The clock divider is set in register RTICTL and is: (N+1)*2^(M+9),
-	 * where N is the bit field RTR3 through RTR0  (N is lower bits)
-	 * 	and M is the bit field RTR6 through RTR4. (M is higher bits)
-	 * 0110 0011 = 0x63 ==> 1 / (8MHz / 4*2^15)
-	 * 	which means RTI will happen every 16.384 ms
-	 * Another example:
-	 * 0111 1111 = 0x7F ==> 1 / (8MHz / 16*2^16)
-	 * 	which means RTI will happen every 131.072 ms
-	 * Another example:
-	 * 0001 0001 = 0x11 ==> 1 / (8MHz / 2*2^10)   = 256us
-	 */
 	RTICTL = rti_ctl_value;
 
 	// How many times we had RTI interrupts
@@ -116,8 +102,8 @@ int main(void) {
 					op = c;
 					DispChar(0, cursor++, '*');
 				}
-
 				break;
+					
 			case 'A'://second input for addition
 				if (c >= '0' && c <= '9') {
 					b = b * 10 + (c - '0');
@@ -148,9 +134,7 @@ int main(void) {
 				a = 0; // a and b are reset to 0 as a placeholder
 				b = 0;
 				op = '!'; //op is reset to ASCII ! as a placeholder
-				buf = 12; //buf is reset to C
 				DispClrScr();
-				//DispStr(1, 1, "Calculator");
 			}
 			printf("Debug: %d\r\nKeypad: %c\r\n", result, c);
 		}
